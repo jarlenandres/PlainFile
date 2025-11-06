@@ -23,7 +23,6 @@
             {
                 using (File.Create(_path))
                 {
-                    // Create the file if it does not exist
                 }
             }
         }
