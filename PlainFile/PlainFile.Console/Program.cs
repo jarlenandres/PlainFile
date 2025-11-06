@@ -40,6 +40,7 @@ do
             break;
     }
 } while (opc != "0");
+textFile.WriteAllLines(lines.ToArray());
 
 string Menu()
 {
