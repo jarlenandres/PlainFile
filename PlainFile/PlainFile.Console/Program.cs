@@ -31,6 +31,24 @@ do
             SaveFile(poeple, listName);
             Console.WriteLine("File saved.");
             break;
+        case "4":
+            Console.Write("Enter the name of the person to delete: ");
+            var nameToDelete = Console.ReadLine();
+            var personToDelete = poeple.Find(p => p[0].Equals(nameToDelete, StringComparison.OrdinalIgnoreCase));
+            if (personToDelete != null)
+            {
+                poeple.Remove(personToDelete);
+                Console.WriteLine("Person deleted.");
+            }
+            else
+            {
+                Console.WriteLine("Person not found.");
+            }
+            break;
+        case "5":
+            poeple.Sort((a, b) => string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase));
+            Console.WriteLine("List ordered by name.");
+            break;
         case "0":
             Console.WriteLine("Exiting...");
             break;
@@ -46,6 +64,8 @@ string MyMenu()
     Console.WriteLine("1. Add.");
     Console.WriteLine("2. Show.");
     Console.WriteLine("3. Save.");
+    Console.WriteLine("4. Delete.");
+    Console.WriteLine("5. Order.");
     Console.WriteLine("0. Exit.");
     Console.WriteLine("Select an option: ");
     return Console.ReadLine() ?? string.Empty;
