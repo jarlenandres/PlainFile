@@ -1,63 +1,59 @@
 ﻿using PlainFile.Core;
 
-var textFile = new SimpleTextFile("data.txt");
-var lines = textFile.ReadAllLines().ToList();
-var opc = string.Empty;
-
-using var logger = new LogWriter("app.log");
-logger.WriteLog("INFO", "Application started.");
+Console.Write("Enter the list name: ");
+var listName = Console.ReadLine();
+var manualCsv = new ManualCsvHelper();
+var poeple = manualCsv.ReadCsv($"{listName}.csv");
+var option = string.Empty;
 
 do
 {
-    opc = Menu();
-    switch (opc)
+    switch(option)
     {
         case "1":
-            Console.WriteLine("Contents:");
-            logger.WriteLog("INFO", "The file was displayed.");
-            foreach (var line in lines)
-            {
-                Console.WriteLine(line);
-            }
+            Console.Write("Enter name: ");
+            var name = Console.ReadLine();
+            Console.Write("Enter lastname: ");
+            var lastName= Console.ReadLine();
+            Console.Write("Entre age: ");
+            var age = Console.ReadLine();
+            poeple.Add(new string[] { name ?? string.Empty, lastName ?? string.Empty, age ?? string.Empty });
             break;
         case "2":
-            Console.Write("Enter a new line: ");
-            var newLine = Console.ReadLine();
-            if (!string.IsNullOrEmpty(newLine))
+            Console.WriteLine("List of people:");
+            Console.WriteLine($"Nombres | Apellidos | Edad");
+            foreach (var person in poeple)
             {
-                lines.Add(newLine);
-                Console.WriteLine("Line added.");
-                logger.WriteLog("INFO", $"A new line was added: {newLine}");
-            }
-            else
-            {
-                Console.WriteLine("No line added.");
-                logger.WriteLog("WARNING", "Attempted to add an empty line.");
+                Console.WriteLine($"{person[0]} | {person[1]} | {person[2]}");
             }
             break;
         case "3":
-            textFile.WriteAllLines(lines.ToArray());
+            SaveFile(poeple, listName);
             Console.WriteLine("File saved.");
-            logger.WriteLog("INFO", "The file was saved.");
             break;
         case "0":
             Console.WriteLine("Exiting...");
-            logger.WriteLog("INFO", "Application exited.");
             break;
         default:
-            Console.WriteLine("Invalid option. Please try again.");
-            logger.WriteLog("ERROR", $"Invalid menu option selected: {opc}");
+            Console.WriteLine("Invalid option.");
             break;
     }
-} while (opc != "0");
-textFile.WriteAllLines(lines.ToArray());
+    option = MyMenu();
+} while (option != "0");
 
-string Menu()
+string MyMenu()
 {
-    Console.WriteLine("1. Show");
-    Console.WriteLine("2. Add");
-    Console.WriteLine("3. Save");
-    Console.WriteLine("0. Exit");
-    Console.Write("Option: ");
+    Console.WriteLine("1. Add.");
+    Console.WriteLine("2. Show.");
+    Console.WriteLine("3. Save.");
+    Console.WriteLine("0. Exit.");
+    Console.WriteLine("Select an option: ");
     return Console.ReadLine() ?? string.Empty;
+}
+
+SaveFile(poeple, listName);
+
+void SaveFile(List<string[]> poeple, string? listName)
+{
+    manualCsv.WriteCsv($"{listName}.csv", poeple);
 }
