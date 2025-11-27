@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,18 +11,35 @@ namespace PlainFile.Core;
 
 public class NugetCsvHelper
 {
-    public void Write(string path, IEnumerable<Person> people)
+
+    private readonly CsvConfiguration _config;
+
+    public NugetCsvHelper()
     {
-        using var sw = new StreamWriter(path);
-        using var cw = new CsvWriter(sw, CultureInfo.InvariantCulture);
-        cw.WriteRecords(people);
+        _config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            Delimiter = ","
+        };
     }
 
-    public IEnumerable<Person> Read(string path)
+    public List<Person> Read(string filePath)
     {
-        using var sr = new StreamReader(path);
-        using var cr = new CsvReader(sr, CultureInfo.InvariantCulture);
-        var records = cr.GetRecords<Person>().ToList();
-        return records;
+        if (!File.Exists(filePath))
+        {
+            return new List<Person>();
+        }
+
+        using var reader = new StreamReader(filePath);
+        using var csv = new CsvReader(reader, _config);
+        return csv.GetRecords<Person>().ToList();
     }
+
+    public void Write(string filePath, IEnumerable<Person> people)
+    {
+        using var writer = new StreamWriter(filePath);
+        using var csv = new CsvWriter(writer, _config);
+        csv.WriteRecords(people);
+    }
+
 }

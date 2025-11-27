@@ -1,118 +1,115 @@
 ﻿using PlainFile.Core;
 
-Console.Write("Enter the list name (Defaul 'people'): ");
+
+Console.Write("Enter the list name (Default 'people'): ");
 var listName = Console.ReadLine();
 if (string.IsNullOrEmpty(listName))
 {
     listName = "people";
 }
 
+var filePath = $"{listName}.csv";
 var helper = new NugetCsvHelper();
-var poeple = helper.Read($"{listName}.csv").ToList();
-var option = string.Empty;
+var people = helper.Read(filePath);
+string option;
 
 do
 {
-    option = MyMenu();
+    option = ShowMenu();
     Console.WriteLine();
-    Console.WriteLine();
+
     switch (option)
     {
         case "1":
-            Add();
+            AddPerson(people);
             break;
         case "2":
-            ListPeople();
+            ListPeople(people);
             break;
         case "3":
-           // SaveFile(poeple, listName);
-            Console.WriteLine("File saved.");
+            helper.Write(filePath, people);
+            Console.WriteLine("✅ File saved.");
             break;
         case "4":
-            Console.Write("Enter the name of the person to delete: ");
-            var nameToDelete = Console.ReadLine();
-           //// var personToDelete = poeple.Find(p => p[0].Equals(nameToDelete, StringComparison.OrdinalIgnoreCase));
-           // if (personToDelete != null)
-           // {
-           //     poeple.Remove(personToDelete);
-           //     Console.WriteLine("Person deleted.");
-           // }
-           // else
-           // {
-           //     Console.WriteLine("Person not found.");
-           // }
+            DeletePerson(people);
             break;
         case "5":
-            //poeple.Sort((a, b) => string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase));
-            Console.WriteLine("List ordered by name.");
+            people = people.OrderBy(p => p.Name).ToList();
+            Console.WriteLine("✅ List ordered by name.");
             break;
         case "0":
             Console.WriteLine("Exiting...");
             break;
         default:
-            Console.WriteLine("Invalid option.");
+            Console.WriteLine("⚠️ Invalid option.");
             break;
     }
 
 } while (option != "0");
+    }
 
-void ListPeople()
+    static string ShowMenu()
 {
-    Console.WriteLine("List of people:");
-    Console.WriteLine($"Nombres | Apellidos | Edad");
-    foreach (var person in poeple)
-    {
-        Console.WriteLine($"ID: {person.Id}, Name: {person.Name}, Age: {person.Age}");
-    }
-}
-
-void Add()
-{
-    Console.Write("Enter Id: ");
-    if (int.TryParse(Console.ReadLine(), out var id))
-    {
-        return;
-    }
-    else
-    {
-        Console.WriteLine("Invalid Id. It must be a number.");
-        return;
-    }
-    Console.Write("Enter name: ");
-    var name = Console.ReadLine();
-    Console.Write("Enter lastname: ");
-    var lastName = Console.ReadLine();
-    Console.Write("Entre age: ");
-    Console.Write("Enter Id: ");
-    if (int.TryParse(Console.ReadLine(), out var age))
-    {
-        return;
-    }
-    else
-    {
-        Console.WriteLine("Invalid Id. It must be a number.");
-        return;
-    }
-    poeple.Add(new Person { Id = id, Name = name, Age = age });
-}
-
-string MyMenu()
-{
-    Console.WriteLine();
-    Console.WriteLine();
-    Console.WriteLine("1. Add.");
-    Console.WriteLine("2. Show.");
-    Console.WriteLine("3. Save.");
-    Console.WriteLine("4. Delete.");
-    Console.WriteLine("5. Order.");
-    Console.WriteLine("0. Exit.");
-    Console.WriteLine("Select an option: ");
+    Console.WriteLine("\n=== MENU ===");
+    Console.WriteLine("1. Add");
+    Console.WriteLine("2. Show");
+    Console.WriteLine("3. Save");
+    Console.WriteLine("4. Delete");
+    Console.WriteLine("5. Order");
+    Console.WriteLine("0. Exit");
+    Console.Write("Select an option: ");
     return Console.ReadLine() ?? string.Empty;
 }
 
-//SaveFile(poeple, listName);
-
-void SaveFile(IEnumerable<Person> poeple)
+static void ListPeople(List<Person> people)
 {
-   // NugetCsvHelper.Write(poeple);
+    Console.WriteLine("\nList of people:");
+    Console.WriteLine($"{"ID",-5}{"Name",-15}{"LastName",-15}{"Age",-5}");
+    foreach (var person in people)
+    {
+        Console.WriteLine($"{person.Id,-5}{person.Name,-15}{person.LastName,-15}{person.Age,-5}");
+    }
+}
+
+static void AddPerson(List<Person> people)
+{
+    Console.Write("Enter Id: ");
+    if (!int.TryParse(Console.ReadLine(), out var id))
+    {
+        Console.WriteLine("⚠️ Invalid Id. It must be a number.");
+        return;
+    }
+
+    Console.Write("Enter name: ");
+    var name = Console.ReadLine() ?? string.Empty;
+
+    Console.Write("Enter lastname: ");
+    var lastName = Console.ReadLine() ?? string.Empty;
+
+    Console.Write("Enter age: ");
+    if (!int.TryParse(Console.ReadLine(), out var age))
+    {
+        Console.WriteLine("⚠️ Invalid age. It must be a number.");
+        return;
+    }
+
+    people.Add(new Person { Id = id, Name = name, LastName = lastName, Age = age });
+    Console.WriteLine("✅ Person added.");
+}
+
+static void DeletePerson(List<Person> people)
+{
+    Console.Write("Enter the name of the person to delete: ");
+    var nameToDelete = Console.ReadLine();
+    var personToDelete = people.FirstOrDefault(p => p.Name.Equals(nameToDelete, StringComparison.OrdinalIgnoreCase));
+
+    if (personToDelete != null)
+    {
+        people.Remove(personToDelete);
+        Console.WriteLine("✅ Person deleted.");
+    }
+    else
+    {
+        Console.WriteLine("⚠️ Person not found.");
+    }
 }
